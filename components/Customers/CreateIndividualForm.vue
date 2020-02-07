@@ -72,10 +72,12 @@ methods: {
   },
    createCustomerWithImages(e) {
   AWS.config.update({region: 'eu-west-2'});
+  const keyID = process.env.ACCESS_KEY_ID;
+  const secret = process.env.SECRET_ACCESS_KEY
     const bucket = "photography-collection-bucket-123";
     const s3 = new AWS.S3({
-      accessKeyId: process.env.ACCESS_KEY_ID,
-      secretAccessKey: process.env.SECRET_ACCESS_KEY
+      accessKeyId: keyID,
+      secretAccessKey: secret
     })
   const attributeLength = this.images.length
   Array.from(Array(attributeLength).keys()).forEach((el, i) => {
