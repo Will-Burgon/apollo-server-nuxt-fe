@@ -72,7 +72,7 @@ methods: {
   },
    createCustomerWithImages(e) {
   AWS.config.update({region: 'eu-west-2'});
-  console.log(process.access_key_id, process.env.secret_access_key)
+
     const bucket = "photography-collection-bucket-123";
     const s3 = new AWS.S3({
       accessKeyId: process.env.access_key_id,

@@ -11,7 +11,8 @@ import {
   CUSTOMER_QUERY,
   CREATE_INDIVIDUAL,
   GET_INDIVIDUALS,
-  GET_INDIVIDUAL
+  GET_INDIVIDUAL,
+  CREATE_EMAIL
 } from "~/lib/queries/queries";
 
 import ApolloClient from "apollo-boost";
@@ -311,6 +312,16 @@ export const actions = {
       })
       .then(({ data }) => {
         commit("fetchIndividual", data.getIndividual);
+      });
+  },
+  createEmail({ commit }, payload) {
+    client
+      .mutate({
+        mutation: CREATE_EMAIL,
+        variables: payload
+      })
+      .then(({ data }) => {
+        console.log(data);
       });
   }
 };

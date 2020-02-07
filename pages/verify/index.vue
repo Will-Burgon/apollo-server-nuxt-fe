@@ -56,10 +56,10 @@ export default {
   },
   methods: {
     submitForVerification(){
-      this.$axios.$post("http://localhost:4500/", {
-       code: this.customerCode,
-       email: this.customerEmail
-      }).then(res => console.log(res))
+      this.$store.dispatch("createEmail", {
+        email: this.customerEmail,
+        uniqueID: this.customerCode
+      })
     }
   }
 }
