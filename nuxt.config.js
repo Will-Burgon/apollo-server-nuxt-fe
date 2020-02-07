@@ -5,13 +5,11 @@ const path = require("path");
 let development = process.env.NODE_ENV !== "production";
 export default {
   mode: "universal",
-  env: [
-    env.parsed,
-    {
-      ACCESS_KEY_ID: process.env.ACCESS_KEY_ID,
-      SECRET_ACCESS_KEY: process.env.SECRET_ACCESS_KEY
-    }
-  ],
+  // env: env.parsed,
+  env: {
+    access_key_id: process.env.ACCESS_KEY_ID,
+    secret_access_key: process.env.SECRET_ACCESS_KEY
+  },
   /*
    ** Headers of the page
    */
