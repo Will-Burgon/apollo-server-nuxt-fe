@@ -183,10 +183,7 @@ export const actions = {
         commit("setAdmin", data.getCurrentAdmin);
         Cookie.set("user", data.getCurrentAdmin.name.replace(" ", "-"));
         if (process.client) {
-          sessionStorage.setItem(
-            "user",
-            data.getCurrentAdmin.name.replace(" ", "-")
-          );
+          sessionStorage.setItem("user", Cookie.get("user").replace(" ", "-"));
         }
       })
       .catch(err => {
