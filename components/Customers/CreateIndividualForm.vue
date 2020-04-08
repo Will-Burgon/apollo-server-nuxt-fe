@@ -29,7 +29,7 @@
            </v-layout>
 
 
-           <photoUpload v-on:imagesUpload = "imageUploadMethod" />
+           <photoUpload v-on:imagesUpload = "imageUploadMethod" :key="clear"/>
     <v-layout row>
              <v-flex xs12>
              <v-btn color="secondary" type="submit" >Submit</v-btn>
@@ -62,7 +62,8 @@ return {
   uniqueID: "",
   url: [],
   images: [],
-  customer: ""
+  customer: "",
+  clear: false
 }
 },
 methods: {
@@ -103,6 +104,10 @@ methods: {
       images: this.url,
       customer: this.customer
     })
+    this.uniqueID = "";
+    this.images = [];
+    this.url = [];
+    this.clear = !this.clear;
   }
 },
 middleware: "isAuth"

@@ -12,6 +12,7 @@ import {
   CREATE_INDIVIDUAL,
   GET_INDIVIDUALS,
   GET_INDIVIDUAL,
+  DELETE_INDIVIDUAL,
   CREATE_EMAIL
 } from "~/lib/queries/queries";
 
@@ -141,6 +142,8 @@ export const mutations = {
   },
   setIndividual(state, payload) {
     state.newIndividual = payload;
+    const individual = { id: payload.customer._id, details: payload };
+    Vue.set(state.individuals, state.individuals.length, individual);
   },
   fetchIndividuals(state, payload) {
     state.individuals = payload.map(ind => {
@@ -152,6 +155,17 @@ export const mutations = {
   },
   fetchIndividual(state, payload) {
     state.individual = payload;
+  },
+  deletedInvidual(state, payload) {
+    const individual = state.individuals.findIndex(
+      person => person.details.uniqueID === payload.deleteIndividual.uniqueID
+    );
+    if (state.individuals.length > 1) {
+      Vue.delete(state.individuals, individual);
+    } else {
+      Vue.delete(state.individuals, individual);
+      this.app.router.go();
+    }
   }
 };
 export const actions = {
@@ -180,11 +194,16 @@ export const actions = {
         query: GET_CURRENT_ADMIN
       })
       .then(({ data }) => {
-        console.log("Response From getCurrentAdmin", data);
-        commit("setAdmin", data.getCurrentAdmin);
-        Cookie.set("user", data.getCurrentAdmin.name.replace(" ", "-"));
-        if (process.client) {
-          sessionStorage.setItem("user", Cookie.get("user").replace(" ", "-"));
+        if (data !== null) {
+          console.log("Response From getCurrentAdmin in store", data);
+          commit("setAdmin", data.getCurrentAdmin);
+          Cookie.set("user", data.getCurrentAdmin.name.replace(" ", "-"));
+          if (process.client) {
+            sessionStorage.setItem(
+              "user",
+              Cookie.get("user").replace(" ", "-")
+            );
+          }
         }
       })
       .catch(err => {
@@ -301,7 +320,6 @@ export const actions = {
       })
       .then(({ data }) => {
         commit("fetchIndividuals", data.getIndividuals);
-        console.log("from async", data.getIndividuals);
       });
   },
   getIndividual({ commit }, payload) {
@@ -312,6 +330,17 @@ export const actions = {
       })
       .then(({ data }) => {
         commit("fetchIndividual", data.getIndividual);
+      });
+  },
+  deleteIndividual({ commit }, payload) {
+    client
+      .mutate({
+        mutation: DELETE_INDIVIDUAL,
+        variables: payload
+      })
+      .then(({ data }) => {
+        console.log("data from delete mutation", data);
+        commit("deletedInvidual", data);
       });
   },
   createEmail({ commit }, payload) {

@@ -1,6 +1,5 @@
-
 export default ({ store }) => {
   //  store.dispatch("initAuth", req);
-  store.dispatch("getCurrentAdmin");
-
+  console.log("From Plugin Auth");
+  // store.dispatch("getCurrentAdmin");
 };

@@ -4,10 +4,12 @@
     <v-flex xs12 sm6 offset-sm3 >
      <v-card color="white" light>
        <v-container>
-         <v-form enctype="multipart/form-data" novalidate >
+         <v-form enctype="multipart/form-data" novalidate ref="form" id="form">
            <v-layout row>
              <v-flex xs12>
               <v-file-input
+              ref="fileInput"
+            value="files"
             type="file" multiple
             @change ="fileUpload"
             accept="image/*"
@@ -40,15 +42,10 @@
 
 
 export default {
-// props: {
-//   id: String,
-//   title: String,
-//   dateCreated: String
-// },
 data() {
   return {
     files: [],
-    url: []
+    url: [],
   }
 
 },
@@ -57,45 +54,10 @@ methods: {
 fileUpload(e){
 console.log(this.files)
 this.$emit("imagesUpload", this.files)
-// if(e.length){
-//     e.map(file => {
-//      return this.file.push(file)
-//     })
-//     console.log(this.file)
-//     }
-  },
- uploadPhoto(){
-  //  AWS.config.update({region: 'eu-west-2'});
-  //    const bucket = "photography-collection-bucket-123";
-  //   const s3 = new AWS.S3({
-  //     accessKeyId: process.env.ACCESS_KEY_ID,
-  //     secretAccessKey: process.env.SECRET_ACCESS_KEY
-  //   })
-  //  const attributeLength = this.file.length
-  // Array.from(Array(attributeLength).keys()).forEach((el, i) => {
-  //   var params = {
-  //     Bucket: bucket,
-  //     ContentType: this.file[i].type,
-  //     Key: `${this.id}/${this.file[i].name}`,
-  //     };
-  //  const url = s3.getSignedUrl('putObject', params);
-  //  this.url.push(`${url.split("?")[0]}`);
-  //  this.$axios({
-  //     method: "PUT",
-  //     url,
-  //     data: this.file[i],
-  //     processData: false,
-  //     headers: {
-  //       'Content-Type': this.file[i].type
-  //     }
-  //   }).then(res => console.log(res)).catch(err => console.log("Error", err))
-  // })
-  // this.$store.dispatch("createCollection", {
-  //   title: this.title,
-  //   images: this.url,
-  //   customerID: this.id
-  // })
   }
+},
+mounted(){
+   this.files = []
 }
 }
 </script>

@@ -31,7 +31,7 @@
       <v-btn
        color="warning"
       absolute left
-
+ @click="deleteIndividual(individual.details._id, individual.details.uniqueID, individual.details.images)"
       >
         Delete
       </v-btn>
@@ -72,7 +72,7 @@
       <v-btn
        color="warning"
       absolute left
-
+      @click="deleteIndividual(person._id, person.uniqueID, person.images)"
       >
         Delete
       </v-btn>
@@ -110,16 +110,16 @@ components: {
        individuals: data.getIndividuals
      }
    })
-
-
+   store.commit('fetchIndividuals', persons.individuals)
   return {
     id: params.id,
     auth: store.getters["token"],
    persons: persons.individuals
     }
  },
- mounted () {
-   this.consoling()
+ async fetch({params, store}){
+   console.log("Customer ID from fetch",params.id)
+  store.dispatch('getIndividuals', {customer: params.id})
  },
  computed: {
    individuals(){
@@ -127,8 +127,10 @@ components: {
    }
  },
  methods: {
-   consoling(){
-     console.log(this.individuals, this.id)
+   deleteIndividual(id, uniqueID, images) {
+     console.log("_id from delete press",id)
+     this.$store.dispatch("deleteIndividual", {ID: id})
+     //this.$store.commit("deletedInvidual")
    }
  },
  middleware: "isAuth"
