@@ -129,7 +129,9 @@ export default {
       //1. delete individuals from state, mongo and aws
       console.log("New Individuals Delete", this.newIndividuals)
       this.newIndividuals.forEach(el => {
+        console.log("El.id",el.id)
         //delete individuals from mongo and state
+        if(el.id.length){
         this.$store.dispatch("deleteIndividual", {ID: el.details._id})
         //delete individuals from aws
         for(let image of el.details.images){
@@ -144,7 +146,7 @@ export default {
               else console.log("The data from AWS delete", data)
       })
         }
-
+}
       })
 
       //2. delete customers from state, mongo and aws
@@ -152,7 +154,9 @@ export default {
      let filteredArray =  this.newIndividuals.filter(individual => {
        return individual.details._id = id
      })
+     if(filteredArray.length){
      filteredArray.forEach((el, i) => {
+       console.log("el from filteredarray", el)
        const url = el.id;
        const params = {
         Bucket: bucket,
@@ -162,7 +166,7 @@ export default {
         if(err) console.log(err, err.stack);
         else console.log("The data from the customer AWS delete", data)
          })
-     })
+     })}
      this.$store.dispatch("deleteCustomer", {ID: id});
      this.$store.commit('subtractCustomersFromState', index)
     document.getElementById("overlay-blur").classList.remove("overlay-background")
