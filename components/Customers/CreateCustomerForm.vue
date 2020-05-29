@@ -81,8 +81,7 @@
 </template>
 
 <script>
-import AWS from 'aws-sdk';
-import { type } from 'os';
+
 import photoUpload from "~/components/Customers/UploadPhotosForm";
 export default {
 components: {
@@ -107,13 +106,8 @@ methods: {
     this.logo = value[0]
   },
   createCustomerWithImages(e) {
-  AWS.config.update({region: 'eu-west-2'});
-     const bucket = "photography-collection-bucket-123";
-    const s3 = new AWS.S3({
-      accessKeyId: process.env.ACCESS_KEY_ID,
-      secretAccessKey: process.env.SECRET_ACCESS_KEY
-    })
-
+    if(this.logo){
+     const {bucket, s3} = this.$imageUpload()
     var params = {
       Bucket: bucket,
       ContentType: this.logo.type,
@@ -131,6 +125,7 @@ methods: {
         'Content-Type': this.logo.type
       }
     }).then(res => console.log(res)).catch(err => console.log("Error", err))
+    }
    this.$store.dispatch('createCustomer', {
       jobName: this.jobName,
       contact: this.contact,
@@ -140,6 +135,7 @@ methods: {
     })
     //this.$store.commit("addCustomersToState", {jobName: this.jobName, contact: this.contact, email: this.email, phoneNo: this.phoneNo, logo: this.url} )
     this.$emit("customerCreated",{jobName: this.jobName, contact: this.contact, email: this.email, phoneNo: this.phoneNo, logo: this.url} )
+
   }
 }
 }

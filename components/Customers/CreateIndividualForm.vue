@@ -27,6 +27,39 @@
               ></v-text-field>
              </v-flex>
            </v-layout>
+            <v-layout row>
+             <v-flex xs12>
+              <v-text-field
+              prepend-icon="scatter_plot"
+              label="Price"
+              type="number"
+              required
+              v-model="price"
+              ></v-text-field>
+             </v-flex>
+           </v-layout>
+            <v-layout row>
+             <v-flex xs12>
+              <v-text-field
+              prepend-icon="scatter_plot"
+              label="Size"
+              type="text"
+              required
+              v-model="size"
+              ></v-text-field>
+             </v-flex>
+           </v-layout>
+            <v-layout row>
+             <v-flex xs12>
+              <v-text-field
+              prepend-icon="scatter_plot"
+              label="Job Title"
+              type="text"
+              required
+              v-model="jobTitle"
+              ></v-text-field>
+             </v-flex>
+           </v-layout>
 
 
            <photoUpload v-on:imagesUpload = "imageUploadMethod" :key="clear"/>
@@ -48,8 +81,8 @@
 
 <script>
 import photoUpload from "~/components/Customers/UploadPhotosForm";
-import AWS from 'aws-sdk';
-import { type } from 'os';
+// import AWS from 'aws-sdk';
+// import { type } from 'os';
 export default {
 components: {
   photoUpload
@@ -57,12 +90,18 @@ components: {
 props: {
   id: String
 },
+asyncData({params}){
+  console.log("Params from CreateIndividualForm",this.id)
+},
 data(){
 return {
   uniqueID: "",
   url: [],
   images: [],
   customer: "",
+  price: 0,
+  size: "",
+  jobTitle: "",
   clear: false
 }
 },
@@ -70,16 +109,12 @@ methods: {
    imageUploadMethod(value){
     this.images = value;
     this.customer = this.id
+    console.log(this.customer, "The path is not ''")
   },
    createCustomerWithImages(e) {
-  AWS.config.update({region: 'eu-west-2'});
-
-    const bucket = "photography-collection-bucket-123";
-    const s3 = new AWS.S3({
-      accessKeyId: process.env.access_key_id,
-      secretAccessKey: process.env.secret_access_key
-    })
-  const attributeLength = this.images.length
+     if(this.images.length){
+    const {bucket, s3} = this.$imageUpload()
+    const attributeLength = this.images.length
   Array.from(Array(attributeLength).keys()).forEach((el, i) => {
     var params = {
       Bucket: bucket,
@@ -98,15 +133,21 @@ methods: {
         'Content-Type': this.images[i].type
       }
     }).then(res => console.log(res)).catch(err => console.log("Error", err))
-  })
+  })}
    this.$store.dispatch('createIndividual', {
       uniqueID: this.uniqueID,
       images: this.url,
-      customer: this.customer
+      customer: this.customer ? this.customer : this.id,
+      price: parseFloat(this.price),
+      size: this.size,
+      jobTitle: this.jobTitle
     })
     this.uniqueID = "";
     this.images = [];
     this.url = [];
+    this.price = 0;
+    this.size = "";
+    this.jobTitle = "";
     this.clear = !this.clear;
   }
 },

@@ -13,7 +13,8 @@ import {
   GET_INDIVIDUALS,
   GET_INDIVIDUAL,
   DELETE_INDIVIDUAL,
-  CREATE_EMAIL
+  CREATE_EMAIL,
+  DELETE_CUSTOMER
 } from "~/lib/queries/queries";
 
 import ApolloClient from "apollo-boost";
@@ -93,7 +94,8 @@ export const state = () => ({
   adminFromToken: false,
   newIndividual: null,
   individuals: [{ id: "", details: {} }],
-  individual: null
+  individual: null,
+  finishedDeletingMessage: ""
 });
 
 export const mutations = {
@@ -163,9 +165,12 @@ export const mutations = {
     if (state.individuals.length > 1) {
       Vue.delete(state.individuals, individual);
     } else {
-      Vue.delete(state.individuals, individual);
       this.app.router.go();
+      Vue.delete(state.individuals, individual);
     }
+  },
+  activateDeletingMessage(state, payload) {
+    state.finishedDeletingMessage = payload;
   }
 };
 export const actions = {
@@ -308,6 +313,7 @@ export const actions = {
         variables: payload
       })
       .then(({ data }) => {
+        console.log(data);
         commit("setIndividual", data.createIndividual);
       });
     this.app.router.push(`/admin/customers/${payload.customer}`);
@@ -319,6 +325,7 @@ export const actions = {
         variables: payload
       })
       .then(({ data }) => {
+        console.log("Tracing Individuals", data.getIndividuals);
         commit("fetchIndividuals", data.getIndividuals);
       });
   },
@@ -342,6 +349,15 @@ export const actions = {
         console.log("data from delete mutation", data);
         commit("deletedInvidual", data);
       });
+  },
+  deleteCustomer: ({ commit }, payload) => {
+    console.log(JSON.stringify(payload.ID));
+    client
+      .mutate({
+        mutation: DELETE_CUSTOMER,
+        variables: payload
+      })
+      .then(({ data }) => data);
   },
   createEmail({ commit }, payload) {
     client

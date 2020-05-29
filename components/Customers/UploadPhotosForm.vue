@@ -16,7 +16,6 @@
               prepend-icon="attach_file"
               label="Upload Photos"
               v-model="files"
-              required
               ></v-file-input>
              </v-flex>
            </v-layout>

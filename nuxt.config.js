@@ -44,7 +44,7 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ["~/plugins/getAuth.js"],
+  plugins: ["~/plugins/getAuth.js", "~/plugins/imageUpload.js"],
   /*
    ** Nuxt.js dev-modules
    */

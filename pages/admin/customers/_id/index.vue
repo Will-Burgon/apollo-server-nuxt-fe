@@ -5,13 +5,13 @@
       <create-individual-form :id="id" />
       </client-only>
       <v-card>
-        <v-container fluid v-if="individuals.length">
+        <v-container v-if="individuals.length">
           <v-row>
             <v-col
               v-for="(individual) in individuals"
               :key="individual.details._id"
-              class="d-flex child-flex"
-              cols="3"
+              class="d-flex"
+              :cols="$vuetify.breakpoint.xsOnly ? 12 : $vuetify.breakpoint.smOnly ? 6 : 4"
             >
               <v-card flat tile class="d-flex">
 
@@ -20,13 +20,14 @@
 
               class="white--text align-end"
               gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-              height="200px"
+              height="100%"
                 >
                   <v-card-subtitle v-text="individual.details.uniqueID" class="white--text text-center"
                    style=" background: rgba(0,0,0,.5)"></v-card-subtitle>
                 <v-card-actions>
-      <v-btn color="success" :to="{name: 'admin-customers-id-unique',params: {id: individual.details._id, unique: individual.details.uniqueID, images: individual.details.images, auth: auth }}"
-      absolute right>Details</v-btn>
+      <v-btn
+       color="success" :to="{name: 'admin-customers-id-unique',params: {id: individual.details._id, unique: individual.details.uniqueID, images: individual.details.images, auth: auth }}"
+      absolute right >Details</v-btn>
 
       <v-btn
        color="warning"
@@ -46,13 +47,13 @@
           </v-row>
         </v-container>
         <!--ELSE Statement-->
-             <v-container fluid v-else>
+             <v-container v-else>
           <v-row>
             <v-col
               v-for="(person) in persons"
               :key="person._id"
               class="d-flex child-flex"
-              cols="3"
+                :cols="$vuetify.breakpoint.xsOnly ? 12 : $vuetify.breakpoint.smOnly ? 6 : 4"
             >
               <v-card flat tile class="d-flex">
 
@@ -61,7 +62,7 @@
 
               class="white--text align-end"
               gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-              height="200px"
+              height="100%"
                 >
                   <v-card-subtitle v-text="person.uniqueID" class="white--text text-center"
                    style=" background: rgba(0,0,0,.5)"></v-card-subtitle>
@@ -130,7 +131,21 @@ components: {
    deleteIndividual(id, uniqueID, images) {
      console.log("_id from delete press",id)
      this.$store.dispatch("deleteIndividual", {ID: id})
-     //this.$store.commit("deletedInvidual")
+     const {bucket, s3} = this.$imageUpload()
+     images.forEach(img => {
+       const url = `${id}/${uniqueID}/${img}`
+       const seperator = 'com/'
+        var params = {
+      Bucket: bucket,
+      Key: url.split(seperator)[1],
+      };
+      console.log(params)
+       s3.deleteObject(params, function(err, data){
+        if(err) console.log(err, err.stack);
+        else console.log("The data from AWS delete", data)
+      })
+     })
+
    }
  },
  middleware: "isAuth"

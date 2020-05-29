@@ -1,5 +1,6 @@
 <template>
   <v-app>
+       <div id="overlay-blur"></div>
     <!-- Side Navbar -->
     <v-navigation-drawer app temporary fixed v-model="sideNav" class="hidden-sm-and-up">
       <v-toolbar color="secondary" dark >
@@ -187,4 +188,7 @@ watch: {
     opacity: 0;
     transform: translateX(-25px)
   }
+ .v-toolbar {
+   flex: 0;
+ }
 </style>
