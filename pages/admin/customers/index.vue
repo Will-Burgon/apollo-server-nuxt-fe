@@ -154,9 +154,9 @@ export default {
      let filteredArray =  this.newIndividuals.filter(individual => {
        return individual.details._id = id
      })
-     if(filteredArray.length){
+
      filteredArray.forEach((el, i) => {
-       console.log("el from filteredarray", el)
+       if(el.id.length){
        const url = el.id;
        const params = {
         Bucket: bucket,
@@ -166,7 +166,8 @@ export default {
         if(err) console.log(err, err.stack);
         else console.log("The data from the customer AWS delete", data)
          })
-     })}
+         }
+     })
      this.$store.dispatch("deleteCustomer", {ID: id});
      this.$store.commit('subtractCustomersFromState', index)
     document.getElementById("overlay-blur").classList.remove("overlay-background")
