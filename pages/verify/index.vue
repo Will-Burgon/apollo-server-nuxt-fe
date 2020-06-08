@@ -32,7 +32,7 @@
            </v-layout>
             <v-layout row >
              <v-flex row justify-center>
-             <v-btn color="secondary" type="submit" class="center" >Submit</v-btn>
+             <v-btn color="secondary" type="submit" class="center" @click="changeView" >Submit</v-btn>
              </v-flex>
            </v-layout>
          </v-form>
@@ -66,6 +66,9 @@ export default {
         email: this.customerEmail,
         uniqueID: this.customerCode
       })
+    },
+    changeView(){
+      this.verifyForm = false
     }
   }
 }
