@@ -4,7 +4,7 @@
      <v-layout row wrap class="mt-5">
         <v-flex xs12 sm6 offset-sm3 >
             <v-card color="white" light>
-                <v-container>
+                <v-container v-if="verifyForm">
 
          <v-form @submit.prevent="submitForVerification">
 
@@ -37,6 +37,11 @@
            </v-layout>
          </v-form>
                 </v-container>
+                <v-container v-else>
+                  <h4>Thank you for verifying. An email will be with you shortly with a link to your photograph.</h4>
+                  <p>Check your spam folder if you have not received your email within 30 minutes</p>
+                  <p>If you stil haven't received your link then please contact me at: </p>
+                </v-container>
             </v-card>
         </v-flex>
     </v-layout>
@@ -51,7 +56,8 @@ export default {
   data(){
     return {
       customerCode: "",
-      customerEmail: ""
+      customerEmail: "",
+      verifyForm: true
     }
   },
   methods: {
