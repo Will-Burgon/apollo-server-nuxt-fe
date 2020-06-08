@@ -90,10 +90,10 @@ export const state = () => ({
   customers: [],
   token: null,
   newCollection: [],
-  customer: {},
+  customer: null,
   adminFromToken: false,
   newIndividual: null,
-  individuals: [{ id: "", details: {} }],
+  individuals: [],
   individual: null,
   finishedDeletingMessage: ""
 });
@@ -114,6 +114,9 @@ export const mutations = {
   setNewCustomer: (state, payload) => {
     state.newCustomer = payload;
   },
+  setCustomer: (state, payload) => {
+    state.customer = payload;
+  },
   setCustomers: (state, payload) => {
     state.customers = payload;
   },
@@ -125,7 +128,10 @@ export const mutations = {
     Vue.delete(state.customers, payload);
   },
   addIndividualsToState: (state, payload) => {
-    Vue.set(state.individuals, state.individuals.length, payload);
+    const individual = {};
+    individual.id = payload.customer._id;
+    individual.details = payload;
+    Vue.set(state.individuals, state.individuals.length, individual);
   },
   setToken(state, token) {
     state.token = token;
@@ -155,6 +161,9 @@ export const mutations = {
       };
     });
   },
+  fetchIndividualsFromRouter(state, payload) {
+    state.individuals = payload;
+  },
   fetchIndividual(state, payload) {
     state.individual = payload;
   },
@@ -165,8 +174,7 @@ export const mutations = {
     if (state.individuals.length > 1) {
       Vue.delete(state.individuals, individual);
     } else {
-      this.app.router.go();
-      Vue.delete(state.individuals, individual);
+      state.individuals = [];
     }
   },
   activateDeletingMessage(state, payload) {
@@ -278,21 +286,20 @@ export const actions = {
   getCustomers({ commit }) {
     client
       .query({
-        prefetch: true,
         query: GET_CUSTOMERS
       })
       .then(({ data }) => {
         commit("setCustomers", data.getCustomers);
       });
   },
-  getCustomer({ commit }, payload) {
-    client
+  async getCustomer({ commit }, payload) {
+    await client
       .query({
         query: CUSTOMER_QUERY,
-        prefetch: true,
         variables: payload
       })
       .then(({ data }) => {
+        console.log("Getting customer from store", data);
         commit("setCustomer", data.getCustomer);
       });
   },
@@ -316,7 +323,6 @@ export const actions = {
         console.log(data);
         commit("setIndividual", data.createIndividual);
       });
-    this.app.router.push(`/admin/customers/${payload.customer}`);
   },
   getIndividuals({ commit }, payload) {
     client
@@ -336,6 +342,7 @@ export const actions = {
         variables: payload
       })
       .then(({ data }) => {
+        console.log(data.getIndividual);
         commit("fetchIndividual", data.getIndividual);
       });
   },

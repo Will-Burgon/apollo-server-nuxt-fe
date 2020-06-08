@@ -1,18 +1,6 @@
 <template>
   <v-app>
-  <!-- Spinner -->
-     <!-- <v-layout row>
-       <v-dialog persistent fullscreen v-model="setLoading">
-         <v-container fill-height>
-           <v-layout row justify-center align-center>
-             <v-progress-circular indeterminate :size="70" :width="7" color="secondary">
 
-             </v-progress-circular>
-           </v-layout>
-         </v-container>
-       </v-dialog>
-     </v-layout> -->
-       <!-- End Spinner -->
     <h1>Jobs</h1>
     <v-layout row wrap mt-5>
       <v-btn color="primary" @click="showCreateCustomerForm">Create a Job</v-btn>
@@ -30,22 +18,23 @@
           class="d-flex align-center"
           :cols="$vuetify.breakpoint.xsOnly ? 12 : $vuetify.breakpoint.smOnly ? 6 : 4">
 
-          <v-card flat oulined tile class="d-flex flex-column ma-3 pa-2 grey darken-5" shaped width="300px">
+          <v-card flat oulined tile dark color="info" class="d-flex flex-column ma-3 pa-2" shaped width="300px">
            <v-card-subtitle class="text-wrap pa-2"> {{customer.logo}} </v-card-subtitle>
-           <v-card-subtitle class="text-wrap pa-2"> {{customer.jobName}} </v-card-subtitle>
-           <v-card-subtitle class="text-wrap pa-2"> {{customer.contact}} </v-card-subtitle>
-           <v-card-subtitle class="text-wrap pa-2"> {{customer.email}} </v-card-subtitle>
-           <v-card-subtitle class="text-wrap pa-2"> {{customer.phoneNo}} </v-card-subtitle>
-           <v-card-subtitle class="text-wrap pa-2"> {{customer.dateCreated}} </v-card-subtitle>
-           <v-card-subtitle class="text-wrap pa-2"> {{customer._id}} </v-card-subtitle>
+           <v-card-subtitle class="text-wrap text-uppercase display-1 pa-2"> {{customer.jobName}} </v-card-subtitle>
+           <v-card-subtitle class="text-wrap pa-2">Contact Name:<span class="font-weight-bold"> {{customer.contact}}</span> </v-card-subtitle>
+           <v-card-subtitle class="text-wrap pa-2">Email: <span class="font-weight-bold">{{customer.email}}</span> </v-card-subtitle>
+           <v-card-subtitle class="text-wrap pa-2">Phone: <span class="font-weight-bold">{{customer.phoneNo}}</span> </v-card-subtitle>
+           <v-card-subtitle class="text-wrap pa-2">Date Created: <span class="font-weight-bold" >{{ new Date(parseInt(customer.dateCreated)).toLocaleString() }}</span> </v-card-subtitle>
+           <v-card-subtitle class="text-wrap pa-2">Customer ID: <span class="font-weight-bold">{{customer._id}}</span> </v-card-subtitle>
                <v-card-actions>
-      <v-btn color="success" :to="`/admin/customers/${customer._id}`" nuxt
+      <v-btn color="success" :to="{name: 'admin-customers-id', params: {id: customer._id, job: customer.jobName}}" nuxt
       absolute right>Details</v-btn>
 
       <v-btn
        color="warning"
       absolute left
-        @click="addModal"
+
+        @click="addModal(index, customer._id)"
       >
         Delete
       </v-btn>
@@ -55,17 +44,18 @@
       </v-btn>
     </v-card-actions>
           </v-card>
-            <v-card id="pop-up-modal" flat oulined tile v-show="showModal" height="200" >
+            <v-card id="pop-up-modal" flat oulined tile v-if="showModal" height="200" >
       <v-card-text class="black--text text-uppercase">
         Are you sure you want to delete this customer?
         You will lose all your images for this job.
+        {{cardIndex}}
       </v-card-text>
         <v-btn color="success" @click="removeModal"
       absolute right bottom>Cancel</v-btn>
       <v-btn
        color="warning"
       absolute left bottom
-        @click="deleteCustomer(customer._id, index)"
+        @click="deleteCustomer(cardId, cardIndex)"
       >
         Delete
       </v-btn>
@@ -96,7 +86,9 @@ export default {
       showForm: false,
       customersList: [],
       showModal: false,
-      specificIndividuals: this.$store.getters.individuals
+      specificIndividuals: this.$store.getters.individuals,
+      cardIndex: 0,
+      cardId: ""
     }
   },
   mounted(){
@@ -110,9 +102,11 @@ export default {
   },
 
   methods: {
-    addModal(){
+    addModal(val, id){
       document.getElementById("overlay-blur").classList.add("overlay-background")
       this.showModal = !this.showModal
+      this.cardIndex = val
+      this.cardId = id
     },
     removeModal(){
       document.getElementById("overlay-blur").classList.remove("overlay-background")
@@ -125,14 +119,16 @@ export default {
      this.$store.dispatch("getCustomers")
     },
     deleteCustomer(id, index) {
+      console.log("Index of targeted Customer", index)
       const {bucket, s3} = this.$imageUpload();
       //1. delete individuals from state, mongo and aws
       console.log("New Individuals Delete", this.newIndividuals)
+      if(this.newIndividuals.length){
       this.newIndividuals.forEach(el => {
         console.log("El.id",el.id)
         //delete individuals from mongo and state
         if(el.id.length){
-        this.$store.dispatch("deleteIndividual", {ID: el.details._id})
+        this.$store.dispatch("deleteIndividual", {ID: el.id})
         //delete individuals from aws
         for(let image of el.details.images){
              const url = `${el.details.customer._id}/${el.details.uniqueID}/${image}`
@@ -144,17 +140,20 @@ export default {
             s3.deleteObject(params, function(err, data){
               if(err) console.log(err, err.stack);
               else console.log("The data from AWS delete", data)
+            })
+         }
+       }
       })
-        }
-}
-      })
+    }
+
 
       //2. delete customers from state, mongo and aws
 
      let filteredArray =  this.newIndividuals.filter(individual => {
-       return individual.details._id = id
+       return individual.id = id
      })
-
+      console.log("Do we have individuals?",filteredArray)
+      if(filteredArray){
      filteredArray.forEach((el, i) => {
        if(el.id.length){
        const url = el.id;
@@ -168,6 +167,18 @@ export default {
          })
          }
      })
+     } else {
+         const url = id;
+       const params = {
+        Bucket: bucket,
+        Key: url
+        };
+        s3.deleteObject(params, function(err, data){
+        if(err) console.log(err, err.stack);
+        else console.log("The data from the customer AWS delete", data)
+         })
+         }
+      console.log("Correct ID", id)
      this.$store.dispatch("deleteCustomer", {ID: id});
      this.$store.commit('subtractCustomersFromState', index)
     document.getElementById("overlay-blur").classList.remove("overlay-background")
@@ -175,7 +186,7 @@ export default {
 
    },
    customerCreatedMethod(value) {
-     this.customersList = [value, ...this.customersList];
+    //  this.customersList = this.customersList.concat(value);
      this.showForm = !this.showForm
     // this.$store.commit("setCustomers", this.customers)
    }

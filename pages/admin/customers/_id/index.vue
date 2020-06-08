@@ -2,10 +2,11 @@
   <v-row>
     <v-col cols="12" md="12" >
       <client-only>
-      <create-individual-form :id="id" />
+      <create-individual-form :id="id" :job="job" v-on:showSpinnerHandle = "showSpinnerMethod"/>
       </client-only>
       <v-card>
         <v-container v-if="individuals.length">
+          <Spinner v-show="showSpinner" />
           <v-row>
             <v-col
               v-for="(individual) in individuals"
@@ -26,7 +27,7 @@
                    style=" background: rgba(0,0,0,.5)"></v-card-subtitle>
                 <v-card-actions>
       <v-btn
-       color="success" :to="{name: 'admin-customers-id-unique',params: {id: individual.details._id, unique: individual.details.uniqueID, images: individual.details.images, auth: auth }}"
+       color="success" :to="{name: 'admin-customers-id-unique',params: {id: individual.details._id, unique: individual.details.uniqueID, images: individual.details.images, auth: auth, allTheIndividuals: individuals }}"
       absolute right >Details</v-btn>
 
       <v-btn
@@ -47,7 +48,8 @@
           </v-row>
         </v-container>
         <!--ELSE Statement-->
-             <v-container v-else>
+             <v-container v-else-if="persons.length" >
+                 <Spinner v-show="showSpinner" />
           <v-row>
             <v-col
               v-for="(person) in persons"
@@ -67,7 +69,7 @@
                   <v-card-subtitle v-text="person.uniqueID" class="white--text text-center"
                    style=" background: rgba(0,0,0,.5)"></v-card-subtitle>
                 <v-card-actions>
-      <v-btn color="success" :to="{name: 'admin-customers-id-unique',params: {id: person._id, unique: person.uniqueID, images: person.images, auth: auth }}"
+      <v-btn color="success" :to="{name: 'admin-customers-id-unique',params: {id: person._id, unique: person.uniqueID, images: person.images, auth: auth, allTheIndividuals: persons }}"
       absolute right>Details</v-btn>
 
       <v-btn
@@ -87,6 +89,10 @@
             </v-col>
           </v-row>
         </v-container>
+        <v-container v-else>
+          <h1 >Nothing to see here foo</h1>
+        </v-container>
+
       </v-card>
     </v-col>
   </v-row>
@@ -94,14 +100,17 @@
 
 <script>
 import {mapGetters} from 'vuex';
-import { GET_INDIVIDUALS } from "~/lib/queries/queries.js"
-import CreateIndividualForm from "../../../../components/Customers/CreateIndividualForm";
+import { GET_INDIVIDUALS, CUSTOMER_QUERY } from "~/lib/queries/queries.js"
+import CreateIndividualForm from '@/components/Customers/CreateIndividualForm';
+import Spinner from '@/components/UI/Spinner'
 export default {
 components: {
-  CreateIndividualForm
+  CreateIndividualForm,
+  Spinner
 },
-
+//Takes care of page refresh
  async asyncData({ params, store, app }) {
+
    let client = app.apolloProvider.defaultClient;
   const persons = await client.query({
      query: GET_INDIVIDUALS,
@@ -111,25 +120,31 @@ components: {
        individuals: data.getIndividuals
      }
    })
-   store.commit('fetchIndividuals', persons.individuals)
+   console.log("From AsyncData in id-customers", persons.individuals.length)
   return {
     id: params.id,
     auth: store.getters["token"],
    persons: persons.individuals
     }
  },
- async fetch({params, store}){
-   console.log("Customer ID from fetch",params.id)
-  store.dispatch('getIndividuals', {customer: params.id})
+ data(){
+   return {
+      job: this.$route.params.job,
+      showSpinner: false
+   }
  },
+ fetch({store, params}){
+   store.dispatch("getCustomer", { id: params.id });
+ },
+//Gets Individuals when navigating using nuxt
  computed: {
    individuals(){
      return this.$store.getters["individuals"].filter(el => this.id === el.id)
    }
  },
+
  methods: {
    deleteIndividual(id, uniqueID, images) {
-     console.log("_id from delete press",id)
      this.$store.dispatch("deleteIndividual", {ID: id})
      const {bucket, s3} = this.$imageUpload()
      images.forEach(img => {
@@ -145,13 +160,31 @@ components: {
         else console.log("The data from AWS delete", data)
       })
      })
-
+      if(this.individuals.length === 0) {
+        this.persons = []
+      }
+   },
+   showSpinnerMethod() {
+     this.showSpinner = true
    }
  },
- middleware: "isAuth"
+  beforeRouteEnter(to, from, next) {
+if(from.name === "admin-customers-id-unique"){
+  next(vm => {
+    vm.$store.commit("fetchIndividualsFromRouter", from.params.allTheIndividuals)
+  })
+} else {
+  next()
+}
+
+ },
+ middleware: ["isAuth", 'getAllIndividuals']
 }
 </script>
 
 <style>
-
+h1 {
+  text-align: center;
+  color: #607d8b;
+}
 </style>

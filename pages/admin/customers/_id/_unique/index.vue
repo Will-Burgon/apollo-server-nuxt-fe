@@ -1,6 +1,6 @@
 <template>
 <div>
-<v-container v-if="individual" class="pa-2" grid-list-md text-xs-center fluid>
+<!-- <v-container v-if="individual" class="pa-2" grid-list-md text-xs-center fluid>
   <v-layout>
   <v-flex class="d-flex flex-wrap" center >
  <v-card  v-for="img in individual" :key="img.id" raised shaped width="400"  class=" ml-5 mt-5">
@@ -8,8 +8,8 @@
  </v-card>
  </v-flex>
   </v-layout>
-</v-container>
- <v-container v-else class="pa-2" grid-list-md text-xs-center fluid>
+</v-container> -->
+ <v-container class="pa-2" grid-list-md text-xs-center fluid>
    <v-layout style="flex-direction: column">
 
 <v-flex v-for="img in human.images" :key="img.id" raised shaped width="400" class="d-flex flex-wrap justify-center" center ref="parentEl" >
@@ -57,18 +57,7 @@ async asyncData({params, store, app}){
      return human
 },
 
-computed: {
-      ...mapGetters(["individual"]),
-},
-// mounted() {
-//   this.addClass();
-// },
-// methods: {
-//   addClass(){
-//     const { parentEl } = this.$refs;
-//     this.images.length > 1 ? null :  parentEl.classList.add("parent-change")
-//   }
-// }
+
 }
 </script>
 

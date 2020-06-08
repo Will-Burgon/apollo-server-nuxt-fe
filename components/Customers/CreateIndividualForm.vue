@@ -55,7 +55,7 @@
               prepend-icon="scatter_plot"
               label="Job Title"
               type="text"
-              required
+              disabled
               v-model="jobTitle"
               ></v-text-field>
              </v-flex>
@@ -81,6 +81,7 @@
 
 <script>
 import photoUpload from "~/components/Customers/UploadPhotosForm";
+import {  CUSTOMER_QUERY } from "~/lib/queries/queries.js"
 // import AWS from 'aws-sdk';
 // import { type } from 'os';
 export default {
@@ -88,10 +89,8 @@ components: {
   photoUpload
 },
 props: {
-  id: String
-},
-asyncData({params}){
-  console.log("Params from CreateIndividualForm",this.id)
+  id: String,
+  job: String
 },
 data(){
 return {
@@ -101,10 +100,25 @@ return {
   customer: "",
   price: 0,
   size: "",
-  jobTitle: "",
-  clear: false
+  jobTitle: this.job,
+  clear: false,
+  status: 0
 }
 },
+
+async created(){
+   let client = this.$apolloProvider.defaultClient
+    const {customer} = await client.query({
+     query: CUSTOMER_QUERY,
+     variables: { id: this.id}
+   }).then(({data}) => {
+     return {
+        customer : data.getCustomer
+     }
+   })
+   console.log(customer)
+  this.jobTitle = customer.jobName
+ },
 methods: {
    imageUploadMethod(value){
     this.images = value;
@@ -132,9 +146,11 @@ methods: {
       headers: {
         'Content-Type': this.images[i].type
       }
-    }).then(res => console.log(res)).catch(err => console.log("Error", err))
-  })}
-   this.$store.dispatch('createIndividual', {
+    }).then(res => {
+      console.log("Status", res.status)
+      if(res.status === 200){
+        this.$emit("showSpinnerHandle", true)
+ this.$store.dispatch('createIndividual', {
       uniqueID: this.uniqueID,
       images: this.url,
       customer: this.customer ? this.customer : this.id,
@@ -149,9 +165,13 @@ methods: {
     this.size = "";
     this.jobTitle = "";
     this.clear = !this.clear;
+      }
+      }).catch(err => console.log("Error", err))
+  })}
+
   }
 },
-middleware: "isAuth"
+middleware: ["isAuth"]
 }
 </script>
 
