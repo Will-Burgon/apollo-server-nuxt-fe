@@ -128,10 +128,10 @@ export default {
         console.log("El.id",el.id)
         //delete individuals from mongo and state
         if(el.id.length){
-        this.$store.dispatch("deleteIndividual", {ID: el.id})
+        this.$store.dispatch("deleteIndividual", {ID: el.details._id})
         //delete individuals from aws
         for(let image of el.details.images){
-             const url = `${el.details.customer._id}/${el.details.uniqueID}/${image}`
+             const url = `${el.id}/${el.details.uniqueID}/${image}`
              const seperator = 'com/'
              var params = {
             Bucket: bucket,

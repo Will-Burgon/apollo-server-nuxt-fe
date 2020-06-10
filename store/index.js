@@ -322,6 +322,7 @@ export const actions = {
       .then(({ data }) => {
         console.log(data);
         commit("setIndividual", data.createIndividual);
+        commit("setLoading", false);
       });
   },
   getIndividuals({ commit }, payload) {
@@ -373,7 +374,9 @@ export const actions = {
         variables: payload
       })
       .then(({ data }) => {
-        console.log(data);
+        if (data.createEmail.email === payload.email) {
+          commit("setLoading", true);
+        }
       });
   }
 };

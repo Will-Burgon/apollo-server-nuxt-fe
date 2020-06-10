@@ -2,11 +2,11 @@
   <v-row>
     <v-col cols="12" md="12" >
       <client-only>
-      <create-individual-form :id="id" :job="job" v-on:showSpinnerHandle = "showSpinnerMethod"/>
+      <create-individual-form :id="id" :job="job"/>
       </client-only>
       <v-card>
         <v-container v-if="individuals.length">
-          <Spinner v-show="showSpinner" />
+          <Spinner id="spinner" />
           <v-row>
             <v-col
               v-for="(individual) in individuals"
@@ -49,7 +49,7 @@
         </v-container>
         <!--ELSE Statement-->
              <v-container v-else-if="persons.length" >
-                 <Spinner v-show="showSpinner" />
+                 <Spinner  id="spinner" :class="loading ? 'visible': ''"/>
           <v-row>
             <v-col
               v-for="(person) in persons"
@@ -129,8 +129,7 @@ components: {
  },
  data(){
    return {
-      job: this.$route.params.job,
-      showSpinner: false
+      job: this.$route.params.job
    }
  },
  fetch({store, params}){
@@ -140,6 +139,9 @@ components: {
  computed: {
    individuals(){
      return this.$store.getters["individuals"].filter(el => this.id === el.id)
+   },
+   loading(){
+     return this.$store.getters["loading"]
    }
  },
 
@@ -182,9 +184,21 @@ if(from.name === "admin-customers-id-unique"){
 }
 </script>
 
-<style>
+<style lang="scss">
 h1 {
   text-align: center;
   color: #607d8b;
+}
+#spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  width: 100%;
+  display: none;
+  &.visible {
+    display: block;
+  }
 }
 </style>

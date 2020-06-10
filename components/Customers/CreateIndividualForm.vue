@@ -149,7 +149,7 @@ methods: {
     }).then(res => {
       console.log("Status", res.status)
       if(res.status === 200){
-        this.$emit("showSpinnerHandle", true)
+        this.$store.commit("setLoading", true)
  this.$store.dispatch('createIndividual', {
       uniqueID: this.uniqueID,
       images: this.url,
@@ -163,7 +163,6 @@ methods: {
     this.url = [];
     this.price = 0;
     this.size = "";
-    this.jobTitle = "";
     this.clear = !this.clear;
       }
       }).catch(err => console.log("Error", err))
