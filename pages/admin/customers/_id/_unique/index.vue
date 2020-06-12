@@ -14,7 +14,7 @@
 
 <v-flex v-for="img in human.images" :key="img.id" raised shaped width="400" class="d-flex flex-wrap justify-center" center ref="parentEl" >
  <v-card class=" flex-50" >
-  <v-img :src="img" height= "100vh" width="100%" max-width="calc(50% - 0)" class="align-end"></v-img>
+  <v-img :src="img" height= "100vh" width="100%" max-width="calc(100% - 5vw)" class="align-end"></v-img>
       <v-card flat oulined tile class="d-flex flex-column ma-3 pa-2 primary darken-5" shaped width="200px"
       :class="$vuetify.breakpoint.smAndDown ? 'info-card-small' : 'info-card'">
   <v-card-subtitle class="text-wrap pa-2 font-white"> Price: {{human.price}} </v-card-subtitle>
@@ -67,7 +67,7 @@ async asyncData({params, store, app}){
 }
 .flex-50 {
   flex-basis: calc(50% - 20px);
-  max-width: 768px;
+  max-width: 768px !important;
 }
 .info-card {
   position: absolute !important;
