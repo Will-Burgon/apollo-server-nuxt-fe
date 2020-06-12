@@ -171,7 +171,7 @@ components: {
    }
  },
   beforeRouteEnter(to, from, next) {
-if(from.name === "admin-customers-id-unique" || from.name === "verify"){
+if(from.name === "admin-customers-id-unique" || from.name === "photo-id"){
   next(vm => {
     vm.$store.commit("fetchIndividualsFromRouter", from.params.allTheIndividuals)
   })
