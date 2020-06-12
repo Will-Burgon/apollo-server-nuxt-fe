@@ -51,8 +51,7 @@
                   <v-card>
                      <v-spacer></v-spacer>
                     <v-card-text class="pt-4">
-                    Sorry there is no image associated with that code. Please check the characters.
-                    If you are still having trouble then please contact me on...
+                    Sorry this code has already been used with this email. Please contact me on...
                     </v-card-text>
 
                     <v-card-actions>
@@ -69,7 +68,32 @@
                   </v-card>
                 </v-dialog>
                 </v-container>
+ <v-container>
+                <v-dialog
+                  max-width="290"
+                  v-model="individualError"
+                  >
+                  <v-card>
+                     <v-spacer></v-spacer>
+                    <v-card-text class="pt-4">
+                    Sorry there is no image associated with that code. Please check the characters.
+                    If you are still having trouble then please contact me on...
+                    </v-card-text>
 
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+
+                      <v-btn
+                        color="green darken-1"
+                        text
+                        @click="hideIndividualError"
+                      >
+                        Ok
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+                </v-container>
             </v-card>
         </v-flex>
     </v-layout>
@@ -90,7 +114,7 @@ export default {
     }
   },
   computed:{
-    ...mapGetters(['loading', 'emailError'])
+    ...mapGetters(['loading', 'emailError', 'individualError'])
   },
   methods: {
     submitForVerification(){
@@ -101,7 +125,10 @@ export default {
     },
     hideEmailError(){
       this.$store.commit("setEmailError", false)
-    }
+    },
+hideIndividualError(){
+  this.$store.commit('setIndividualError', false)
+}
   }
 }
 </script>

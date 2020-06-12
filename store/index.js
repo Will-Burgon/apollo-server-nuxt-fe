@@ -27,7 +27,7 @@ let token;
 
 let localToken;
 let development = process.env.NODE_ENV !== "production";
-
+let graphQlErrors = "";
 export const client = new ApolloClient({
   // include with token with requests made to backend
   fetch,
@@ -69,6 +69,12 @@ export const client = new ApolloClient({
     if (graphQLErrors) {
       for (let err of graphQLErrors) {
         console.log("graphQlErrors", err);
+        if (err.extensions.code === 1) {
+          graphQlErrors = err.extensions.code;
+        }
+        if (err.extensions.code === 2) {
+          graphQlErrors = err.extensions.code;
+        }
       }
     }
     if (networkError) {
@@ -96,7 +102,8 @@ export const state = () => ({
   individuals: [],
   individual: null,
   finishedDeletingMessage: "",
-  emailError: false
+  emailError: false,
+  individualError: false
 });
 
 export const mutations = {
@@ -183,6 +190,9 @@ export const mutations = {
   },
   setEmailError(state, payload) {
     state.emailError = payload;
+  },
+  setIndividualError(state, payload) {
+    state.individualError = payload;
   }
 };
 export const actions = {
@@ -372,21 +382,34 @@ export const actions = {
       .then(({ data }) => data);
   },
   createEmail({ commit }, payload) {
-    client
-      .mutate({
-        mutation: CREATE_EMAIL,
-        variables: payload
-      })
-      .then(({ data }) => {
-        console.log("CreateEmail", data);
-        if (data.createEmail === null) {
-          commit("setEmailError", true);
-        } else {
-          data.createEmail.email === payload.email
-            ? commit("setLoading", true)
-            : null;
-        }
-      });
+    try {
+      console.log(client);
+      client
+        .mutate({
+          mutation: CREATE_EMAIL,
+          variables: payload
+        })
+        .then(({ data }) => {
+          console.log("CreateEmail", data);
+          if (data.createEmail === null) {
+            commit("setEmailError", true);
+          } else {
+            data.createEmail.email === payload.email
+              ? commit("setLoading", true)
+              : null;
+          }
+        })
+        .catch(err => {
+          if (graphQlErrors === 2) {
+            commit("setIndividualError", true);
+          }
+          if (graphQlErrors === 1) {
+            commit("setEmailError", true);
+          }
+        });
+    } catch (err) {
+      console.log("Pish", err, client);
+    }
   }
 };
 
@@ -410,5 +433,6 @@ export const getters = {
   adminFromToken: state => state.adminFromToken,
   individuals: state => state.individuals,
   individual: state => state.individual,
-  emailError: state => state.emailError
+  emailError: state => state.emailError,
+  individualError: state => state.individualError
 };
