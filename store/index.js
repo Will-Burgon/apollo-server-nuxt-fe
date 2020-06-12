@@ -95,7 +95,8 @@ export const state = () => ({
   newIndividual: null,
   individuals: [],
   individual: null,
-  finishedDeletingMessage: ""
+  finishedDeletingMessage: "",
+  emailError: false
 });
 
 export const mutations = {
@@ -179,6 +180,9 @@ export const mutations = {
   },
   activateDeletingMessage(state, payload) {
     state.finishedDeletingMessage = payload;
+  },
+  setEmailError(state, payload) {
+    state.emailError = payload;
   }
 };
 export const actions = {
@@ -374,8 +378,13 @@ export const actions = {
         variables: payload
       })
       .then(({ data }) => {
-        if (data.createEmail.email === payload.email) {
-          commit("setLoading", true);
+        console.log("CreateEmail", data);
+        if (data.createEmail === null) {
+          commit("setEmailError", true);
+        } else {
+          data.createEmail.email === payload.email
+            ? commit("setLoading", true)
+            : null;
         }
       });
   }
@@ -400,5 +409,6 @@ export const getters = {
   customer: state => state.customer,
   adminFromToken: state => state.adminFromToken,
   individuals: state => state.individuals,
-  individual: state => state.individual
+  individual: state => state.individual,
+  emailError: state => state.emailError
 };

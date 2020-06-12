@@ -37,11 +37,39 @@
            </v-layout>
          </v-form>
                 </v-container>
+
                 <v-container v-else>
                   <h4>Thank you for verifying. An email will be with you shortly with a link to your photograph.</h4>
                   <p>Check your spam folder if you have not received your email within 30 minutes</p>
                   <p>If you still haven't received your link then please contact me at: </p>
                 </v-container>
+                <v-container>
+                <v-dialog
+                  max-width="290"
+                  v-model="emailError"
+                  >
+                  <v-card>
+                     <v-spacer></v-spacer>
+                    <v-card-text class="pt-4">
+                    Sorry there is no image associated with that code. Please check the characters.
+                    If you are still having trouble then please contact me on...
+                    </v-card-text>
+
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+
+                      <v-btn
+                        color="green darken-1"
+                        text
+                        @click="hideEmailError"
+                      >
+                        Ok
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+                </v-container>
+
             </v-card>
         </v-flex>
     </v-layout>
@@ -57,11 +85,12 @@ export default {
   data(){
     return {
       customerCode: "",
-      customerEmail: ""
+      customerEmail: "",
+      dialog: false
     }
   },
   computed:{
-    ...mapGetters(['loading'])
+    ...mapGetters(['loading', 'emailError'])
   },
   methods: {
     submitForVerification(){
@@ -69,6 +98,9 @@ export default {
         email: this.customerEmail,
         uniqueID: this.customerCode
       })
+    },
+    hideEmailError(){
+      this.$store.commit("setEmailError", false)
     }
   }
 }
