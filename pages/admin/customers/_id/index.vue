@@ -138,7 +138,11 @@ components: {
 //Gets Individuals when navigating using nuxt
  computed: {
    individuals(){
+     if(this.$store.getters["individuals"]){
      return this.$store.getters["individuals"].filter(el => this.id === el.id)
+     } else {
+       return []
+     }
    },
    loading(){
      return this.$store.getters["loading"]

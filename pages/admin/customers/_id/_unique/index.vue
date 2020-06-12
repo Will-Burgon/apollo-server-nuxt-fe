@@ -70,7 +70,7 @@ async asyncData({params, store, app}){
   max-width: 768px;
 }
 .info-card {
-  position: absolute;
+  position: absolute !important;
   height: 50%;
   top: 50%;
   left: -50%;
