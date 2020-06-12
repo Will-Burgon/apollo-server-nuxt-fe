@@ -19,7 +19,7 @@
           :cols="$vuetify.breakpoint.xsOnly ? 12 : $vuetify.breakpoint.smOnly ? 6 : 4">
 
           <v-card flat oulined tile dark color="info" class="d-flex flex-column ma-3 pa-2" shaped width="300px">
-           <v-card-subtitle class="text-wrap pa-2"> {{customer.logo}} </v-card-subtitle>
+           <!-- <v-card-subtitle class="text-wrap pa-2"> {{customer.logo}} </v-card-subtitle> -->
            <v-card-subtitle class="text-wrap text-uppercase display-1 pa-2"> {{customer.jobName}} </v-card-subtitle>
            <v-card-subtitle class="text-wrap pa-2">Contact Name:<span class="font-weight-bold"> {{customer.contact}}</span> </v-card-subtitle>
            <v-card-subtitle class="text-wrap pa-2">Email: <span class="font-weight-bold">{{customer.email}}</span> </v-card-subtitle>
